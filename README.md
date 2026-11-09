@@ -4,6 +4,8 @@ A **Can Games API** é uma API REST desenvolvida em JavaScript com Node.js e Exp
 
 Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e autenticação de usuários, carrinho, lista de desejos, biblioteca e pedidos. O projeto tem finalidade acadêmica e utiliza armazenamento temporário em memória, sem banco de dados.
 
+🔗 **Acesse a API:** [https://api-can.arisesystem.com.br/](https://api-can.arisesystem.com.br/). Para verificar se ela está em funcionamento, acesse [`/health`](https://api-can.arisesystem.com.br/health).
+
 ---
 
 ## 🎮 Funcionalidades
@@ -34,6 +36,15 @@ Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e aute
 | Jest e Supertest | Testes automatizados |
 | ESLint e Prettier | Análise e formatação do código |
 | Nodemon | Reinicialização automática durante o desenvolvimento |
+| Docker | Execução da API em contêiner no servidor de produção |
+| Portainer | Gerenciamento dos contêineres no servidor |
+| Cloudflare Tunnel (`cloudflared`) | Publicação da API na internet, com HTTPS |
+
+### Servidor de produção
+
+Em produção, a API é executada em um contêiner Docker em um servidor caseiro, junto com o front-end, e os contêineres são gerenciados pelo Portainer. A publicação na internet é feita pelo Cloudflare Tunnel: o `cloudflared`, em execução no servidor, mantém uma conexão de saída com a Cloudflare, que disponibiliza a API em `https://api-can.arisesystem.com.br` com HTTPS. Dessa forma, não é necessário abrir portas no roteador nem expor o endereço IP do servidor.
+
+As instruções estão na seção [Execução com Docker](#execução-com-docker).
 
 ---
 

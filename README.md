@@ -53,8 +53,10 @@ can-api/
 │   ├── data.js          # Acesso aos dados em memória
 │   └── server.js        # Inicialização do servidor
 ├── tests/               # Testes automatizados
+├── .dockerignore        # Arquivos que ficam fora da imagem Docker
 ├── .env                 # Variáveis de ambiente (criado localmente)
 ├── .gitignore
+├── Dockerfile           # Imagem de produção da API
 ├── eslint.config.js
 ├── jest.config.js
 ├── nodemon.json
@@ -566,6 +568,7 @@ JWT_EXPIRES_IN=7d
 CHEAPSHARK_BASE_URL=https://www.cheapshark.com/api/1.0
 STEAM_STORE_BASE_URL=https://store.steampowered.com/api
 CHEAPSHARK_USER_AGENT=CanGamesAPI/1.0 (academic project)
+TRUST_PROXY=0
 ```
 
 Gere um segredo aleatório para `JWT_SECRET` com o Node.js:
@@ -579,6 +582,8 @@ Copie o valor gerado e substitua `COLE_AQUI_UM_SEGREDO_FORTE` no `.env`.
 **Atenção:** não publique o arquivo `.env` nem compartilhe o `JWT_SECRET`. Não utilize o segredo de exemplo em um ambiente de produção. O projeto possui um segredo de fallback apenas para desenvolvimento; em produção, a aplicação exige que `JWT_SECRET` seja configurado.
 
 `FRONTEND_ORIGIN` deve corresponder à origem do front-end. Se houver mais de uma origem autorizada, informe-as separadas por vírgula.
+
+`TRUST_PROXY` informa quantos proxies ficam na frente da API. Na execução local, utilize `0`. Atrás do Cloudflare Tunnel, utilize `1`. Dessa forma, o limite de requisições considera o IP de cada usuário, e não o IP do `cloudflared`, compartilhado por todos.
 
 ### 4. Iniciar o servidor
 
@@ -601,6 +606,10 @@ http://localhost:4000/health
 ```
 
 Uma resposta com `status: "ok"` indica que o servidor está operacional.
+
+### Execução com Docker
+
+O `Dockerfile` gera a imagem de produção da API. Em produção, essa imagem é construída pelo `docker-compose.yml` do [repositório do front-end](https://github.com/Wesley-Sousa-Dev/can), que também inicia o front-end e o Cloudflare Tunnel. As instruções estão na seção "Deploy no servidor" do README do front-end.
 
 ---
 

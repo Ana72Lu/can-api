@@ -1,0 +1,8 @@
+# Arquivos que não entram no contexto do build da imagem.
+node_modules
+.env
+.env.*
+.git
+tests
+coverage
+*.md

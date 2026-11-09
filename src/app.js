@@ -13,6 +13,9 @@ import { errorHandler, notFoundHandler } from './middlewares/errorHandler.js';
 const app = express();
 
 app.disable('x-powered-by');
+// Atrás de um proxy, todas as requisições chegam com o IP dele. Confiar no proxy faz o req.ip
+// ser o IP do usuário, e o limite de requisições passa a valer por usuário, não para todos juntos.
+app.set('trust proxy', env.trustProxy);
 app.use(helmet());
 app.use(
   cors({

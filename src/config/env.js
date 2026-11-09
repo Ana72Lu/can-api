@@ -10,6 +10,8 @@ export const env = {
   cheapsharkBaseUrl: process.env.CHEAPSHARK_BASE_URL || 'https://www.cheapshark.com/api/1.0',
   steamStoreBaseUrl: process.env.STEAM_STORE_BASE_URL || 'https://store.steampowered.com/api',
   cheapsharkUserAgent: process.env.CHEAPSHARK_USER_AGENT || 'CanGamesAPI/1.0',
+  // Quantidade de proxies na frente da API. Atrás do Cloudflare Tunnel, o valor é 1 (o cloudflared).
+  trustProxy: Number(process.env.TRUST_PROXY) || 0,
 };
 
 if (env.nodeEnv === 'production' && env.jwtSecret === 'development-only-change-me') {

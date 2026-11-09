@@ -1,275 +1,220 @@
 # Can Games API
 
-API REST acadêmica da loja fictícia **Can Games**, desenvolvida em JavaScript com Node.js e Express. A aplicação integra as APIs da CheapShark e da Steam Store para obter informações sobre jogos, preços, descontos e outros dados.
+A **Can Games API** é uma API REST desenvolvida em JavaScript com Node.js e Express. Ela reúne informações de jogos e ofertas por meio das APIs da [CheapShark](https://www.cheapshark.com/api) e da [Steam Store](https://store.steampowered.com/api), disponibilizando os dados em um formato organizado para consumo pelo front-end.
 
-Os dados dos usuários e das funcionalidades da loja são armazenados temporariamente em memória, sem utilização de banco de dados.
+Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e autenticação de usuários, carrinho, lista de desejos, biblioteca e pedidos. O projeto tem finalidade acadêmica e utiliza armazenamento temporário em memória, sem banco de dados.
 
----
+## 🎮 Funcionalidades
 
-## Requisitos
+- Consulta e pesquisa de jogos, com filtros, paginação e ordenação.
+- Exibição de preços, descontos, imagens, gêneros, avaliações e detalhes dos jogos.
+- Cadastro, login, logout e gerenciamento do perfil de usuário.
+- Gerenciamento de carrinho e lista de desejos.
+- Consulta da biblioteca e registro da última vez em que um jogo foi executado.
+- Finalização simulada de pedidos, com inclusão dos jogos comprados na biblioteca.
+- Proteção de rotas, validação de dados e tratamento padronizado de erros.
 
-Antes de executar o projeto, certifique-se de possuir:
+## 🛠️ Tecnologias
 
-- **Node.js:** versão 20 ou superior.
-- **npm:** gerenciador de pacotes do Node.js.
-- **Conexão com a internet:** necessária para consultar as APIs da CheapShark e da Steam Store.
+| Tecnologia | Utilização |
+|---|---|
+| JavaScript (ES Modules) | Linguagem e organização dos módulos |
+| Node.js 20+ | Ambiente de execução |
+| Express 4 | Criação do servidor e das rotas HTTP |
+| CheapShark API | Consulta de ofertas, preços e informações de vendas |
+| Steam Store API | Consulta de detalhes, imagens, gêneros, plataformas e informações complementares dos jogos |
+| JSON Web Token (`jsonwebtoken`) | Geração e verificação de tokens de autenticação |
+| `bcryptjs` | Hash e verificação de senhas |
+| `dotenv` | Leitura das variáveis de ambiente |
+| `cors`, `helmet` e `express-rate-limit` | Configurações básicas de segurança e controle de requisições |
+| Jest e Supertest | Testes automatizados |
+| ESLint e Prettier | Análise e formatação do código |
+| Nodemon | Reinicialização automática durante o desenvolvimento |
 
----
-
-## Instalação e execução
-
-### 1. Obter o projeto
-
-Clone o repositório ou baixe os arquivos e acesse a pasta da API:
-
-```bash
-git clone https://github.com/Ana72Lu/can-api.git
-cd can-api
-```
-
-### 2. Instalar as dependências
-
-Execute:
-
-```bash
-npm install
-```
-
-### 3. Configurar as variáveis de ambiente
-
-Crie um arquivo chamado `.env` na raiz do projeto, no mesmo nível do `package.json`.
-
-Utilize a configuração abaixo como referência:
-
-```env
-PORT=4000
-NODE_ENV=development
-FRONTEND_ORIGIN=http://localhost:3000
-JWT_SECRET=change-this-to-a-long-random-secret
-JWT_EXPIRES_IN=7d
-CHEAPSHARK_BASE_URL=https://www.cheapshark.com/api/1.0
-STEAM_STORE_BASE_URL=https://store.steampowered.com/api
-CHEAPSHARK_USER_AGENT=CanGamesAPI/1.0 (academic project)
-```
-
-Os valores apresentados são exemplos para configuração local. Antes de executar a API, gere um segredo próprio para o `JWT_SECRET`, conforme explicado a seguir.
-
-### 4. Gerar o JWT_SECRET
-
-O `JWT_SECRET` é uma chave privada utilizada pela API para assinar e verificar os tokens JWT durante a autenticação dos usuários.
-
-Para gerar um segredo aleatório e seguro, utilize o próprio Node.js:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-O comando gera uma sequência hexadecimal aleatória de 128 caracteres. Copie o resultado e substitua o valor de `JWT_SECRET` no arquivo `.env`:
-
-```env
-JWT_SECRET=COLE_AQUI_O_SEGREDO_GERADO
-```
-
-**Importante:**
-
-- Não utilize o valor de exemplo apresentado na configuração como segredo definitivo.
-- Não compartilhe o `JWT_SECRET` nem o publique no GitHub.
-- O arquivo `.env` deve permanecer fora do controle de versão.
-- Em produção, utilize um segredo próprio e diferente daquele utilizado nos testes locais.
-
-### 5. Executar a API
-
-Para iniciar o servidor em modo de desenvolvimento:
-
-```bash
-npm run dev
-```
-
-O Nodemon monitora as alterações nos arquivos e reinicia automaticamente o servidor quando necessário.
-
-Para iniciar em modo normal, sem reinicialização automática:
-
-```bash
-npm start
-```
-
-Por padrão, a API estará disponível em:
-
-```text
-http://localhost:4000
-```
-
-Para verificar se o servidor está funcionando, acesse:
-
-```text
-http://localhost:4000/health
-```
-
-Se estiver tudo correto, a rota retornará uma resposta indicando que a API está operacional.
-
----
-
-## Variáveis de ambiente
-
-As configurações do projeto são definidas no arquivo `.env`, criado manualmente na raiz da aplicação.
-
-| Variável | Valor de exemplo | Descrição |
-|---|---|---|
-| `PORT` | `4000` | Porta utilizada pelo servidor HTTP. |
-| `NODE_ENV` | `development` | Ambiente de execução da aplicação. |
-| `FRONTEND_ORIGIN` | `http://localhost:3000` | Origem autorizada para requisições do frontend. Aceita múltiplas origens separadas por vírgula. |
-| `JWT_SECRET` | Deve ser configurado | Segredo utilizado para assinatura e verificação dos tokens JWT. |
-| `JWT_EXPIRES_IN` | `7d` | Tempo de validade dos tokens JWT. |
-| `CHEAPSHARK_BASE_URL` | `https://www.cheapshark.com/api/1.0` | URL-base da API CheapShark. |
-| `STEAM_STORE_BASE_URL` | `https://store.steampowered.com/api` | URL-base da Steam Store API. |
-| `CHEAPSHARK_USER_AGENT` | `CanGamesAPI/1.0 (academic project)` | Identificação utilizada nas requisições à CheapShark. |
-
----
-
-## Estrutura do projeto
-
-A aplicação utiliza uma arquitetura organizada em camadas, separando as responsabilidades de configuração, rotas, controladores, regras de negócio e armazenamento.
+## 📁 Estrutura do projeto
 
 ```text
 can-api/
 ├── src/
 │   ├── config/          # Configurações e variáveis de ambiente
-│   ├── controllers/     # Tratamento das requisições e respostas HTTP
+│   ├── controllers/     # Controladores das requisições HTTP
 │   ├── middlewares/     # Autenticação, validação e tratamento de erros
-│   ├── models/          # Entidades e armazenamento em memória
+│   ├── models/          # Modelos e estruturas de armazenamento
 │   ├── routes/          # Definição dos endpoints
 │   ├── services/        # Regras de negócio e integrações externas
-│   ├── utils/           # Funções auxiliares e erros HTTP
+│   ├── utils/           # Funções auxiliares
 │   ├── app.js           # Configuração da aplicação Express
-│   ├── data.js          # Dados iniciais, quando aplicável
+│   ├── data.js          # Acesso aos dados em memória
 │   └── server.js        # Inicialização do servidor
-├── tests/
-    └── app.test.js      # Testes automatizados
+├── tests/               # Testes automatizados
+├── .env                 # Variáveis de ambiente (criado localmente)
+├── .gitignore
+├── eslint.config.js
+├── jest.config.js
+├── nodemon.json
+├── package.json
+└── package-lock.json
 ```
 
----
+## 🏗️ Arquitetura e Integrações
 
-## Autenticação
+A Can Games API consulta duas fontes externas e combina os dados recebidos para disponibilizar informações de jogos, ofertas e preços.
 
-A autenticação utiliza **JWT (JSON Web Token)**, com tokens assinados por meio do segredo definido em `JWT_SECRET`.
+```mermaid
+graph TD
+    CS["CheapShark API<br/><small>Ofertas e preços</small>"] --> API["Can Games API<br/><small>Node.js + Express</small>"]
+    SS["Steam Store API<br/><small>Detalhes dos jogos</small>"] --> API
+```
 
-Após realizar o login, a API retorna um token que deve ser enviado no cabeçalho `Authorization` das requisições que exigem autenticação.
+### APIs utilizadas
 
-Formato:
+- **[CheapShark API](https://www.cheapshark.com/api):** fornece ofertas e preços. A integração consulta a loja Steam (`storeID=1`) e utiliza informações como preço, economia/desconto e identificador do jogo na Steam, quando disponível.
+- **[Steam Store API](https://store.steampowered.com/api):** complementa os dados dos jogos por meio do endpoint `appdetails`, com informações como descrição, desenvolvedores, publicadoras, gêneros, imagens, plataformas, idiomas, requisitos e preço regional, quando disponível.
+
+A API combina e normaliza os dados recebidos antes de utilizá-los nas respostas. As consultas externas são armazenadas em cache temporário por 10 minutos para reduzir chamadas repetidas.
+
+## 🔐 Autenticação, armazenamento e limitações
+
+### Autenticação
+
+A autenticação utiliza **JWT (JSON Web Token)**. Após o login, a API gera um token assinado com o segredo configurado em `JWT_SECRET`. Nas rotas protegidas, o cliente deve enviá-lo no cabeçalho:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-No Postman, selecione a opção **Authorization**, escolha o tipo **Bearer Token** e informe o token recebido no login.
+As senhas são armazenadas como hash, utilizando `bcryptjs` com fator de custo 12. A senha original não é armazenada. Além da verificação da assinatura e da validade do JWT, a API verifica se o token ainda está registrado no controle de sessões mantido em memória.
 
-As rotas protegidas são identificadas nas tabelas de endpoints.
+### Armazenamento
 
----
+Não há integração com banco de dados. Os dados de usuários, sessões, carrinhos, listas de desejos, bibliotecas e pedidos permanecem em estruturas JavaScript na memória do processo Node.js. O cache das consultas às APIs externas também é mantido em memória.
 
-## Endpoints
+**Consequência:** ao parar ou reiniciar o servidor, os dados armazenados em memória são perdidos. Isso inclui contas cadastradas, hashes de senha, sessões, carrinhos, listas, bibliotecas, pedidos e cache. O armazenamento não é compartilhado entre diferentes instâncias do servidor.
 
-Todas as rotas da API utilizam o prefixo `/api`, exceto `/health`.
+### Limitações e regras de negócio
 
-URL-base:
+- **Finalidade acadêmica:** a API é uma implementação demonstrativa, não um serviço de produção.
+- **Sem persistência:** não utiliza banco de dados nem grava os dados das funcionalidades da loja em disco.
+- **Dependência externa:** a consulta de ofertas e detalhes depende da disponibilidade e das respostas da CheapShark e da Steam Store.
+- **Cache temporário:** os resultados externos ficam em cache por até 10 minutos.
+- **Preços e moedas:** quando há preço da Steam em BRL, `priceInCents` representa o valor em centavos de real. Se a fonte disponível apresentar outra moeda, a API não realiza conversão cambial e mantém `priceInCents` como `null`. O objeto `price` informa a moeda e a origem do preço.
+- **Dados locais:** `unitsSold` e `isFeatured` são valores locais, pois não são fornecidos pelas APIs integradas.
+- **Biblioteca:** jogos só são adicionados após a finalização de um pedido. Não existem endpoints para adicionar ou remover jogos diretamente da biblioteca.
+- **Pagamento:** a finalização do pedido é simulada. Nenhuma cobrança ou transação financeira real é realizada.
+- **Testes:** os testes automatizados existentes não cobrem necessariamente todos os endpoints e cenários. As funcionalidades sem cobertura devem ser verificadas manualmente.
+
+## 🔌 Endpoints
+
+A API utiliza o protocolo HTTP e retorna os dados no formato JSON. A URL-base padrão para execução local é:
 
 ```text
-http://localhost:4000/api
+http://localhost:4000
 ```
 
-### Health Check
+Todas as rotas funcionais, exceto `/health`, utilizam o prefixo `/api`.
 
-Verifica se o servidor está funcionando.
+**Sobre a autenticação:**
+- **Pública:** não exige token.
+- **Obrigatória:** exige um JWT válido no cabeçalho `Authorization`.
+- **Opcional:** funciona sem token, associando os dados ao visitante (`guest`); com um token válido, associa os dados ao usuário autenticado.
 
-| Método | Rota | Autenticação | Descrição |
+Nas requisições com corpo JSON, informe o cabeçalho `Content-Type: application/json`.
+
+### Visão geral
+
+| Recurso | Método e endpoint | Autenticação | Finalidade |
 |---|---|---|---|
-| GET | `/health` | Não | Verifica a disponibilidade da API. |
+| Health check | `GET /health` | Pública | Verificar se a API está ativa. |
+| Jogos | `GET /api/games` | Pública | Listar, pesquisar e filtrar jogos e ofertas. |
+| Jogos | `GET /api/games/:identifier` | Pública | Consultar os detalhes de um jogo. |
+| Carrinho | `GET /api/cart` | Opcional | Consultar os itens do carrinho. |
+| Carrinho | `POST /api/cart` | Opcional | Adicionar um jogo ao carrinho. |
+| Carrinho | `DELETE /api/cart/:gameId` | Opcional | Remover um jogo do carrinho. |
+| Lista de desejos | `GET /api/wishlist` | Opcional | Consultar a lista de desejos. |
+| Lista de desejos | `POST /api/wishlist` | Opcional | Adicionar um jogo à lista. |
+| Lista de desejos | `DELETE /api/wishlist/:gameId` | Opcional | Remover um jogo da lista. |
+| Lista de desejos | `PATCH /api/wishlist/:gameId` | Opcional | Alterar a posição de um jogo na lista. |
+| Biblioteca | `GET /api/library` | Obrigatória | Consultar os jogos adquiridos. |
+| Biblioteca | `PATCH /api/library/:gameId` | Obrigatória | Atualizar a data da última execução. |
+| Usuários | `POST /api/users` | Pública | Cadastrar uma conta. |
+| Usuários | `GET /api/users/me` | Obrigatória | Consultar o próprio perfil. |
+| Usuários | `PATCH /api/users/:id` | Obrigatória | Atualizar o próprio perfil. |
+| Usuários | `DELETE /api/users/:id` | Obrigatória | Excluir a própria conta. |
+| Sessões | `POST /api/sessions` | Pública | Realizar login e obter um JWT. |
+| Sessões | `DELETE /api/sessions` | Obrigatória | Encerrar a sessão atual. |
+| Pedidos | `GET /api/orders` | Obrigatória | Consultar os próprios pedidos. |
+| Pedidos | `POST /api/orders` | Obrigatória | Finalizar uma compra simulada. |
 
-Exemplo:
+### Health check
+
+Verifica se o servidor está em execução. Não exige autenticação.
 
 ```http
-GET http://localhost:4000/health
+GET /health
 ```
+
+Uma resposta bem-sucedida indica que a API está operacional.
 
 ### Jogos
 
-As rotas de jogos integram informações da CheapShark e da Steam Store.
+As rotas de jogos integram informações da CheapShark e da Steam Store. A listagem permite paginação, pesquisa, filtros e ordenação.
 
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/games` | Não | Lista jogos e ofertas disponíveis. |
-| GET | `/games/:identifier` | Não | Consulta os detalhes de um jogo pelo Steam App ID ou identificador textual. |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/games` | Retorna uma lista de jogos e ofertas. |
+| `GET` | `/api/games/:identifier` | Retorna os detalhes de um jogo pelo Steam App ID ou identificador textual aceito pela API. |
 
-**Parâmetros de consulta de `GET /games`:**
+**Parâmetros de consulta de `GET /api/games`:**
 
-| Parâmetro | Descrição |
-|---|---|
-| `page` | Página dos resultados. |
-| `limit` | Quantidade de jogos por página. |
-| `search` | Pesquisa jogos pelo nome. |
-| `onSale` | Filtra jogos em promoção (`true` ou `false`). |
-| `genre` | Filtra jogos por gênero. |
-| `sort` | Define a ordenação dos resultados. |
+| Parâmetro | Descrição | Exemplo |
+|---|---|---|
+| `page` | Página dos resultados. | `page=0` |
+| `limit` | Quantidade de jogos por página. | `limit=24` |
+| `search` | Pesquisa pelo nome do jogo. | `search=counter` |
+| `onSale` | Filtra jogos em promoção (`true` ou `false`). | `onSale=true` |
+| `genre` | Filtra por gênero. | `genre=action` |
+| `sort` | Define a ordenação dos resultados. | `sort=...` |
 
-Exemplo:
+**Exemplos de requisição:**
 
 ```http
 GET /api/games?page=0&limit=24&onSale=true
-```
-
-Pesquisa:
-
-```http
 GET /api/games?search=counter
-```
-
-Filtro por gênero:
-
-```http
 GET /api/games?genre=action
-```
-
-Consulta dos detalhes de um jogo:
-
-```http
 GET /api/games/570
 ```
 
-A listagem retorna dados normalizados para utilização pelo frontend, incluindo identificador, título, descrição, desenvolvedor, data de lançamento, gêneros, imagens, preço, desconto, tags e resumo das avaliações, além de informações auxiliares.
+A listagem retorna informações normalizadas para o uso pela aplicação, que podem incluir:
+- Identificação e título do jogo;
+- Descrição resumida;
+- Desenvolvedor e data de lançamento;
+- Gêneros e tags;
+- Imagens;
+- Preço atual e original, moeda e percentual de desconto;
+- Indicação de promoção;
+- Resumo das avaliações;
+- Informações auxiliares utilizadas pela loja.
 
-O objeto de preço mantém os valores decimais e a identificação da moeda:
+A consulta individual acrescenta informações disponíveis na Steam Store, como descrição completa, capturas de tela, plataformas, idiomas, recursos, requisitos mínimos e recomendados e metadados de classificação etária.
 
-```json
-{
-  "current": 59.99,
-  "original": 99.99,
-  "currency": "BRL",
-  "discountPercent": 40,
-  "isOnSale": true
-}
-```
-
-Os campos `current` e `original` representam valores na unidade da moeda informada em `currency`. Não são valores inteiros em centavos.
-
-O campo `priceInCents`, quando disponível, representa o preço em centavos de BRL. Quando a fonte fornece apenas um preço em outra moeda, o campo permanece `null`, evitando conversões cambiais não realizadas pela aplicação. Jogos gratuitos retornam `0`.
-
-Os campos `unitsSold` e `isFeatured` são informações locais, pois as fontes externas não disponibilizam esses dados.
-
-A rota individual acrescenta informações como descrições, capturas de tela, plataformas, idiomas, recursos, requisitos mínimos e recomendados e metadados de classificação etária.
-
-A classificação indicativa brasileira (`ageRating`) permanece `null` quando não há informação correspondente. A classificação etária da Steam não é equivalente à classificação brasileira, por isso seus descritores são preservados separadamente em `ageRatingSteam`.
+**Observações sobre preços:**
+- `price.current` e `price.original` representam valores na unidade da moeda indicada em `price.currency`.
+- `priceInCents`, quando disponível, representa o preço em centavos de real (BRL).
+- Se a fonte apresentar outra moeda e não houver preço em BRL, `priceInCents` permanece `null`; a API não realiza conversão cambial.
+- Jogos gratuitos possuem preço igual a `0`.
+- `unitsSold` e `isFeatured` são informações locais, não fornecidas pelas APIs externas.
 
 ### Carrinho
 
-Gerencia os jogos adicionados ao carrinho.
+Permite consultar, adicionar e remover jogos do carrinho. A autenticação é opcional.
 
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/cart` | Não | Consulta os itens do carrinho. |
-| POST | `/cart` | Não | Adiciona um jogo ao carrinho. |
-| DELETE | `/cart/:gameId` | Não | Remove um jogo do carrinho. |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/cart` | Consulta os itens do carrinho. |
+| `POST` | `/api/cart` | Adiciona um jogo ao carrinho. |
+| `DELETE` | `/api/cart/:gameId` | Remove um jogo do carrinho pelo identificador. |
 
-**Adicionar jogo:**
+**Adicionar um jogo — `POST /api/cart`:**
 
 ```http
 POST /api/cart
@@ -292,39 +237,54 @@ Corpo da requisição:
 }
 ```
 
-**Consultar carrinho:**
+O objeto `game` deve conter, no mínimo, `id` e `title`. Para que o item possa participar da finalização de um pedido, também deve possuir um `priceInCents` válido em centavos de BRL.
+
+**Consultar o carrinho:**
 
 ```http
 GET /api/cart
 ```
 
-**Remover jogo:**
+**Remover um jogo:**
 
 ```http
 DELETE /api/cart/570
 ```
 
+Quando a requisição é feita sem token, o carrinho pertence ao visitante (`guest`). Quando é feita com um JWT válido, os itens são associados ao usuário autenticado.
+
 ### Lista de desejos
 
-Gerencia os jogos que o usuário deseja adquirir futuramente.
+Permite organizar os jogos que o usuário ou visitante pretende adquirir futuramente. A autenticação é opcional.
 
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/wishlist` | Não | Consulta a lista de desejos. |
-| POST | `/wishlist` | Não | Adiciona um jogo à lista. |
-| DELETE | `/wishlist/:gameId` | Não | Remove um jogo da lista. |
-| PATCH | `/wishlist/:gameId` | Não | Altera a posição de um jogo na lista. |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/wishlist` | Consulta a lista de desejos. |
+| `POST` | `/api/wishlist` | Adiciona um jogo à lista. |
+| `DELETE` | `/api/wishlist/:gameId` | Remove um jogo da lista. |
+| `PATCH` | `/api/wishlist/:gameId` | Altera a posição de um jogo na lista. |
 
-**Adicionar jogo:**
+**Adicionar um jogo — `POST /api/wishlist`:**
 
-```http
-POST /api/wishlist
-Content-Type: application/json
+O corpo utiliza a mesma estrutura do cadastro de um item no carrinho:
+
+```json
+{
+  "game": {
+    "id": "570",
+    "title": "Dota 2",
+    "priceInCents": 0
+  }
+}
 ```
 
-O corpo segue o mesmo formato utilizado para adicionar jogos ao carrinho.
+**Consultar a lista:**
 
-**Alterar posição:**
+```http
+GET /api/wishlist
+```
+
+**Alterar a posição — `PATCH /api/wishlist/:gameId`:**
 
 ```http
 PATCH /api/wishlist/570
@@ -337,63 +297,53 @@ Content-Type: application/json
 }
 ```
 
-**Remover jogo:**
+**Remover um jogo:**
 
 ```http
 DELETE /api/wishlist/570
 ```
 
+Assim como no carrinho, os dados são associados ao visitante quando não há token e ao usuário quando há autenticação válida.
+
 ### Biblioteca
 
-Consulta e atualiza os jogos adquiridos pelo usuário.
+A biblioteca reúne os jogos adquiridos pelo usuário. Ambas as rotas exigem autenticação.
 
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/library` | Sim | Consulta os jogos da biblioteca. |
-| PATCH | `/library/:gameId` | Sim | Atualiza a data da última execução do jogo (`lastPlayedAt`). |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/library` | Consulta os jogos da biblioteca. |
+| `PATCH` | `/api/library/:gameId` | Atualiza a data da última execução (`lastPlayedAt`). |
 
-**Consultar biblioteca:**
+**Consultar a biblioteca:**
 
 ```http
 GET /api/library
 Authorization: Bearer <token>
 ```
 
-**Registrar execução:**
+**Registrar ou atualizar a última execução:**
 
 ```http
 PATCH /api/library/570
 Authorization: Bearer <token>
 ```
 
-A biblioteca possui uma regra de negócio específica: jogos só podem ser adicionados após a finalização de uma compra aprovada.
+A biblioteca possui uma regra de negócio específica: jogos só podem ser adicionados após a finalização de uma compra aprovada. Por isso, não existem endpoints `POST /api/library` ou `DELETE /api/library/:gameId`. A inclusão é realizada pelo serviço de pedidos, e os jogos não podem ser removidos diretamente da biblioteca.
 
-Por esse motivo, a API não disponibiliza `POST /library` nem `DELETE /library/:gameId`. A inclusão ocorre exclusivamente pelo serviço de pedidos, e os jogos não podem ser removidos diretamente da biblioteca.
-
-As respostas das coleções seguem a estrutura:
-
-```json
-{
-  "gameId": "570",
-  "addedAt": "2026-11-08T12:00:00.000Z",
-  "lastPlayedAt": null
-}
-```
-
-O objeto completo do jogo é mantido internamente para processamento dos pedidos e gerenciamento das coleções.
+Os registros da biblioteca contêm informações como o identificador do jogo, a data de aquisição (`addedAt`) e a data da última execução (`lastPlayedAt`).
 
 ### Usuários
 
-Gerencia o cadastro, a consulta, a atualização e a exclusão de contas.
+Gerencia o cadastro e os dados da conta. As operações de consulta, atualização e exclusão exigem autenticação e são restritas ao próprio usuário.
 
-| Método | Rota | Autenticação | Descrição |
+| Método | Endpoint | Autenticação | Descrição |
 |---|---|---|---|
-| POST | `/users` | Não | Cadastra um novo usuário. |
-| GET | `/users/me` | Sim | Consulta o perfil do usuário autenticado. |
-| PATCH | `/users/:id` | Sim | Atualiza os dados do próprio perfil. |
-| DELETE | `/users/:id` | Sim | Exclui a própria conta e seus dados associados. |
+| `POST` | `/api/users` | Pública | Cadastra um novo usuário. |
+| `GET` | `/api/users/me` | Obrigatória | Consulta o perfil autenticado. |
+| `PATCH` | `/api/users/:id` | Obrigatória | Atualiza os dados do próprio perfil. |
+| `DELETE` | `/api/users/:id` | Obrigatória | Exclui a própria conta e os dados associados. |
 
-**Cadastrar usuário:**
+**Cadastrar usuário — `POST /api/users`:**
 
 ```http
 POST /api/users
@@ -411,16 +361,16 @@ Content-Type: application/json
 }
 ```
 
-Todos os campos são obrigatórios. A senha deve possuir pelo menos oito caracteres, incluindo letras e números. O cadastro também valida os demais dados informados.
+Todos os campos são obrigatórios. A senha deve possuir pelo menos oito caracteres, incluindo letras e números. Os dados informados também passam pelas validações de cadastro.
 
-**Consultar perfil:**
+**Consultar o próprio perfil:**
 
 ```http
 GET /api/users/me
 Authorization: Bearer <token>
 ```
 
-**Atualizar perfil:**
+**Atualizar o perfil — `PATCH /api/users/:id`:**
 
 ```http
 PATCH /api/users/ID_DO_USUARIO
@@ -437,25 +387,25 @@ Content-Type: application/json
 }
 ```
 
-**Excluir conta:**
+**Excluir a própria conta:**
 
 ```http
 DELETE /api/users/ID_DO_USUARIO
 Authorization: Bearer <token>
 ```
 
-A exclusão remove os dados associados à conta armazenados na aplicação.
+A exclusão remove a conta e os dados associados mantidos pela aplicação.
 
 ### Sessões
 
-Gerencia a autenticação e o encerramento de sessões.
+Responsável pelo login e pelo encerramento da sessão autenticada.
 
-| Método | Rota | Autenticação | Descrição |
+| Método | Endpoint | Autenticação | Descrição |
 |---|---|---|---|
-| POST | `/sessions` | Não | Realiza o login e retorna o token JWT. |
-| DELETE | `/sessions` | Sim | Encerra a sessão autenticada. |
+| `POST` | `/api/sessions` | Pública | Realiza login e retorna um JWT. |
+| `DELETE` | `/api/sessions` | Obrigatória | Encerra a sessão atual. |
 
-**Login:**
+**Login — `POST /api/sessions`:**
 
 ```http
 POST /api/sessions
@@ -469,7 +419,9 @@ Content-Type: application/json
 }
 ```
 
-A resposta contém o token JWT e os dados públicos do usuário:
+Em caso de credenciais válidas, a resposta contém um token JWT e os dados públicos do usuário. O token deve ser utilizado nas demais requisições protegidas.
+
+Exemplo simplificado da estrutura de resposta:
 
 ```json
 {
@@ -485,25 +437,25 @@ A resposta contém o token JWT e os dados públicos do usuário:
 }
 ```
 
-**Logout:**
+**Logout — `DELETE /api/sessions`:**
 
 ```http
 DELETE /api/sessions
 Authorization: Bearer <token>
 ```
 
-O logout encerra a sessão e retorna o status HTTP `204 No Content`.
+O logout invalida a sessão mantida em memória e retorna `204 No Content`.
 
 ### Pedidos
 
-Gerencia a consulta e a finalização de compras.
+Gerencia a consulta e a finalização de compras. As duas rotas exigem autenticação.
 
-| Método | Rota | Autenticação | Descrição |
-|---|---|---|---|
-| GET | `/orders` | Sim | Consulta os pedidos do usuário autenticado. |
-| POST | `/orders` | Sim | Finaliza a compra simulada dos jogos do carrinho. |
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/orders` | Consulta os pedidos do usuário autenticado. |
+| `POST` | `/api/orders` | Finaliza a compra simulada dos jogos do carrinho. |
 
-**Finalizar compra:**
+**Finalizar compra — `POST /api/orders`:**
 
 ```http
 POST /api/orders
@@ -521,80 +473,131 @@ Corpo da requisição:
 ```
 
 Os métodos de pagamento aceitos são:
-
 - `credit-card`
 - `debit-card`
 - `boleto`
 - `pix`
 - `bank-deposit`
 
-A API verifica se os identificadores enviados correspondem exatamente aos jogos presentes no carrinho e valida o método de pagamento.
+A API verifica se os identificadores enviados correspondem exatamente aos jogos presentes no carrinho e valida o método de pagamento. Após a validação, a compra é aprovada de maneira simulada e as seguintes operações são realizadas:
 
-Após a validação, a compra é aprovada de maneira simulada e as seguintes operações são realizadas:
+1. Criação do pedido com identificador no formato `CAN-XXXXXX`;
+2. Cálculo do valor total com base nos preços em centavos de BRL;
+3. Inclusão dos jogos adquiridos na biblioteca;
+4. Remoção dos jogos comprados da lista de desejos;
+5. Esvaziamento do carrinho.
 
-1. O pedido é criado com um identificador no formato `CAN-XXXXXX`.
-2. O valor total é calculado a partir dos preços em centavos de BRL.
-3. Os jogos adquiridos são adicionados à biblioteca.
-4. Os jogos comprados são removidos da lista de desejos.
-5. O carrinho é esvaziado.
+A resposta inclui informações do pedido, como identificador, jogos, método de pagamento, valor total e data de criação.
 
-A resposta inclui os identificadores dos jogos, o método de pagamento, o código do pedido e a data de criação, além dos metadados do pedido.
-
-**Consultar pedidos:**
+**Consultar os pedidos:**
 
 ```http
 GET /api/orders
 Authorization: Bearer <token>
 ```
 
-**Importante:** o processo de pagamento é inteiramente simulado para fins acadêmicos. Nenhuma transação financeira real é realizada.
+> **Importante:** o processo de pagamento é inteiramente simulado para fins acadêmicos. Nenhuma cobrança, integração com gateway ou transação financeira real é realizada.
 
----
+### Fluxo básico de utilização
 
-## Testes e qualidade de código
+Para testar as principais funcionalidades em sequência:
 
-O projeto utiliza Jest e Supertest para executar testes automatizados.
+1. Consulte os jogos em `GET /api/games`.
+2. Cadastre uma conta em `POST /api/users`.
+3. Faça login em `POST /api/sessions` e copie o JWT retornado.
+4. Envie jogos ao carrinho com `POST /api/cart`.
+5. Consulte ou organize a lista de desejos com os endpoints de `/api/wishlist`.
+6. Finalize a compra com `POST /api/orders`, enviando o JWT.
+7. Consulte os jogos adquiridos em `GET /api/library`.
+8. Consulte o histórico de compras em `GET /api/orders`.
 
-Para executar os testes:
+Para as rotas protegidas, envie o token no cabeçalho `Authorization: Bearer <token>`.
+
+## 🚀 Instalação e execução local
+
+### Pré-requisitos
+
+- **Node.js:** versão 20 ou superior.
+- **npm:** instalado junto com o Node.js.
+- **Git:** opcional, caso queira clonar o repositório.
+- **Conexão com a internet:** necessária para consultar as APIs CheapShark e Steam Store.
+
+### 1. Obter o projeto
+
+Clone o repositório e entre na pasta:
 
 ```bash
-npm test
+git clone https://github.com/Ana72Lu/can-api.git
+cd can-api
 ```
 
-Para executar os testes em modo de observação:
+Se você baixou os arquivos ZIP, extraia-os e abra um terminal na pasta do projeto.
+
+### 2. Instalar as dependências
 
 ```bash
-npm run test:watch
+npm install
 ```
 
-**Importante:** os testes automatizados implementados não abrangem todas as rotas e funcionalidades da API. Eles verificam apenas os cenários contemplados no arquivo `tests/app.test.js`. Portanto, a execução de `npm test` não representa uma validação completa de todos os endpoints.
+### 3. Configurar as variáveis de ambiente
 
-As rotas e funcionalidades que não possuem cobertura automatizada devem ser verificadas manualmente, utilizando ferramentas como [Postman](https://www.postman.com/) ou [Insomnia](https://insomnia.rest/).
+Crie um arquivo `.env` na raiz do projeto, no mesmo nível do `package.json`:
 
-Outros comandos disponíveis:
+```env
+PORT=4000
+NODE_ENV=development
+FRONTEND_ORIGIN=http://localhost:3000
+JWT_SECRET=COLE_AQUI_UM_SEGREDO_FORTE
+JWT_EXPIRES_IN=7d
+CHEAPSHARK_BASE_URL=https://www.cheapshark.com/api/1.0
+STEAM_STORE_BASE_URL=https://store.steampowered.com/api
+CHEAPSHARK_USER_AGENT=CanGamesAPI/1.0 (academic project)
+```
+
+Gere um segredo aleatório para `JWT_SECRET` com o Node.js:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+Copie o valor gerado e substitua `COLE_AQUI_UM_SEGREDO_FORTE` no `.env`.
+
+**Atenção:** não publique o arquivo `.env` nem compartilhe o `JWT_SECRET`. Não utilize o segredo de exemplo em um ambiente de produção. O projeto possui um segredo de fallback apenas para desenvolvimento; em produção, a aplicação exige que `JWT_SECRET` seja configurado.
+
+`FRONTEND_ORIGIN` deve corresponder à origem do front-end. Se houver mais de uma origem autorizada, informe-as separadas por vírgula.
+
+### 4. Iniciar o servidor
+
+Modo de desenvolvimento, com reinicialização automática:
+
+```bash
+npm run dev
+```
+
+Modo normal:
+
+```bash
+npm start
+```
+
+Por padrão, a API ficará disponível em `http://localhost:4000`. Para verificar seu funcionamento, acesse:
+
+```text
+http://localhost:4000/health
+```
+
+Uma resposta com `status: "ok"` indica que o servidor está operacional.
+
+## 📜 Comandos disponíveis
 
 | Comando | Descrição |
 |---|---|
+| `npm install` | Instala as dependências do projeto. |
 | `npm run dev` | Inicia o servidor com Nodemon. |
 | `npm start` | Inicia o servidor sem reinicialização automática. |
+| `npm test` | Executa os testes automatizados implementados. |
+| `npm run test:watch` | Executa os testes em modo de observação. |
 | `npm run lint` | Verifica problemas no código com ESLint. |
 | `npm run lint:fix` | Corrige automaticamente problemas corrigíveis pelo ESLint. |
 | `npm run format` | Formata os arquivos com Prettier. |
 | `npm run format:check` | Verifica a formatação sem modificar os arquivos. |
-| `npm test` | Executa os testes automatizados implementados. |
-| `npm run test:watch` | Executa os testes em modo de observação. |
-
----
-
-## Armazenamento e limitações
-
-A API foi desenvolvida para fins acadêmicos e possui algumas limitações:
-
-- **Sem banco de dados:** não utiliza banco de dados, ORM, arquivos YAML ou persistência em disco.
-- **Armazenamento em memória:** usuários, sessões, carrinhos, listas de desejos, bibliotecas e pedidos são mantidos em estruturas JavaScript durante a execução.
-- **Perda de dados:** reiniciar o servidor apaga os dados armazenados em memória.
-- **Integrações externas:** as ofertas e os preços são obtidos da CheapShark, enquanto informações complementares dos jogos são consultadas na Steam Store.
-- **Cache:** os resultados das consultas externas são armazenados temporariamente em memória para reduzir requisições.
-- **Autenticação:** os tokens JWT dependem do segredo configurado e do gerenciamento de sessões em memória.
-- **Pagamento simulado:** a aprovação dos pedidos não envolve um gateway de pagamento ou transações reais.
-- **Dados complementares:** algumas informações específicas da loja, como destaque e unidades vendidas, são valores locais, pois não são fornecidas pelas APIs externas.

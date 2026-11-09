@@ -4,6 +4,8 @@ A **Can Games API** é uma API REST desenvolvida em JavaScript com Node.js e Exp
 
 Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e autenticação de usuários, carrinho, lista de desejos, biblioteca e pedidos. O projeto tem finalidade acadêmica e utiliza armazenamento temporário em memória, sem banco de dados.
 
+---
+
 ## 🎮 Funcionalidades
 
 - Consulta e pesquisa de jogos, com filtros, paginação e ordenação.
@@ -13,6 +15,8 @@ Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e aute
 - Consulta da biblioteca e registro da última vez em que um jogo foi executado.
 - Finalização simulada de pedidos, com inclusão dos jogos comprados na biblioteca.
 - Proteção de rotas, validação de dados e tratamento padronizado de erros.
+
+---
 
 ## 🛠️ Tecnologias
 
@@ -30,6 +34,8 @@ Além da consulta ao catálogo, a API oferece funcionalidades de cadastro e aute
 | Jest e Supertest | Testes automatizados |
 | ESLint e Prettier | Análise e formatação do código |
 | Nodemon | Reinicialização automática durante o desenvolvimento |
+
+---
 
 ## 📁 Estrutura do projeto
 
@@ -56,6 +62,8 @@ can-api/
 └── package-lock.json
 ```
 
+---
+
 ## 🏗️ Arquitetura e Integrações
 
 A Can Games API consulta duas fontes externas e combina os dados recebidos para disponibilizar informações de jogos, ofertas e preços.
@@ -72,6 +80,8 @@ graph TD
 - **[Steam Store API](https://store.steampowered.com/api):** complementa os dados dos jogos por meio do endpoint `appdetails`, com informações como descrição, desenvolvedores, publicadoras, gêneros, imagens, plataformas, idiomas, requisitos e preço regional, quando disponível.
 
 A API combina e normaliza os dados recebidos antes de utilizá-los nas respostas. As consultas externas são armazenadas em cache temporário por 10 minutos para reduzir chamadas repetidas.
+
+---
 
 ## 🔐 Autenticação, armazenamento e limitações
 
@@ -102,6 +112,8 @@ Não há integração com banco de dados. Os dados de usuários, sessões, carri
 - **Biblioteca:** jogos só são adicionados após a finalização de um pedido. Não existem endpoints para adicionar ou remover jogos diretamente da biblioteca.
 - **Pagamento:** a finalização do pedido é simulada. Nenhuma cobrança ou transação financeira real é realizada.
 - **Testes:** os testes automatizados existentes não cobrem necessariamente todos os endpoints e cenários. As funcionalidades sem cobertura devem ser verificadas manualmente.
+
+---
 
 ## 🔌 Endpoints
 
@@ -513,6 +525,8 @@ Para testar as principais funcionalidades em sequência:
 
 Para as rotas protegidas, envie o token no cabeçalho `Authorization: Bearer <token>`.
 
+---
+
 ## 🚀 Instalação e execução local
 
 ### Pré-requisitos
@@ -587,6 +601,8 @@ http://localhost:4000/health
 ```
 
 Uma resposta com `status: "ok"` indica que o servidor está operacional.
+
+---
 
 ## 📜 Comandos disponíveis
 

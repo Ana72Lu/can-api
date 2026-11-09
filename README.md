@@ -62,7 +62,7 @@ A Can Games API consulta duas fontes externas e combina os dados recebidos para 
 
 ```mermaid
 graph TD
-    CS["<b>CheapShark API</b><br/>Ofertas e preços"] --> API["<b>Can Games API</b><br/>Node.js + Express"]
+    CS["<b>CheapShark API</b><br/>Ofertas e preços dos jogos"] --> API["<b>Can Games API</b><br/>Node.js + Express"]
     SS["<b>Steam Store API</b><br/>Detalhes dos jogos"] --> API
 ```
 
